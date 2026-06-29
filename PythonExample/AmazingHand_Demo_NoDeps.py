@@ -34,7 +34,7 @@ import AmazingHand_Calib as ah
 # ====== 手指配置（按 calibration.txt 填写）======
 FINGERS = {
     "index":  dict(ids=(1, 2), off=(0.0, 0.0), flip=True,  present=True),
-    "middle": dict(ids=(3, 4), off=(0.0, 0.0), flip=True,  present=False),
+    "middle": dict(ids=(3, 4), off=(0.0, 0.0), flip=True,  present=True),
     "ring":   dict(ids=(5, 6), off=(0.0, 0.0), flip=True,  present=False),
     "thumb":  dict(ids=(7, 8), off=(0.0, 0.0), flip=True,  present=False),
 }
@@ -58,17 +58,16 @@ def servo_targets(cfg, f, a):
     return (off1 + s * (f + a), off2 + s * (-f + a))
 
 
-def write_servo(fd, sid, deg):
-    ah.write_word(fd, sid, ah.ADDR_GOAL_POSITION, ah.deg_to_raw(deg))
-
-
 def apply_state(fd, state):
-    """state: {finger: (f,a)} 立即写入所有在用手指。"""
+    """state: {finger: (f,a)} —— 用一帧 SYNC WRITE 同时驱动所有舵机，
+    避免逐个发指令导致的卡顿/不同步。"""
+    pairs = []
     for name, (f, a) in state.items():
         cfg = FINGERS[name]
         d1, d2 = servo_targets(cfg, f, a)
-        write_servo(fd, cfg["ids"][0], d1)
-        write_servo(fd, cfg["ids"][1], d2)
+        pairs.append((cfg["ids"][0], ah.deg_to_raw(d1)))
+        pairs.append((cfg["ids"][1], ah.deg_to_raw(d2)))
+    ah.sync_write_words(fd, ah.ADDR_GOAL_POSITION, pairs)
 
 
 def lerp(fd, cur, tgt, dur):

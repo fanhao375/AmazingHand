@@ -56,9 +56,11 @@ ADDR_GOAL_SPEED    = 46   # 0x2E 运行速度（2 字节，大端；0 = 最大�
 ADDR_PRESENT_POS   = 56   # 0x38 当前位置（2 字节，大端）
 
 # ---- 指令 ----
-INST_PING  = 0x01
-INST_READ  = 0x02
-INST_WRITE = 0x03
+INST_PING       = 0x01
+INST_READ       = 0x02
+INST_WRITE      = 0x03
+INST_SYNC_WRITE = 0x83
+BROADCAST_ID    = 0xFE
 
 # ---- 角度 <-> 原始值换算 ----
 CENTER = 512                 # 中位对应的原始位置值
@@ -137,6 +139,17 @@ def write_word(fd, sid, addr, value):
     """写 2 字节大端（高字节在前），SCSCL 协议。"""
     value &= 0xFFFF
     return write_bytes(fd, sid, addr, [(value >> 8) & 0xFF, value & 0xFF])
+
+
+def sync_write_words(fd, addr, pairs):
+    """SYNC WRITE：一帧广播给多个舵机写 2 字节大端（如目标位置）。
+    pairs: [(sid, value), ...]。广播无返回包，纯发送，所有舵机同时生效。"""
+    params = [addr, 2]
+    for sid, val in pairs:
+        val &= 0xFFFF
+        params += [sid, (val >> 8) & 0xFF, val & 0xFF]
+    _drain(fd)
+    os.write(fd, _pkt(BROADCAST_ID, INST_SYNC_WRITE, params))
 
 
 def read_word(fd, sid, addr, retries=3):

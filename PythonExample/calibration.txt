@@ -19,11 +19,11 @@ flip = true
 off1 = 0
 off2 = 0
 
-[middle]  # 中指  —— 待标定
+[middle]  # 中指  —— 已标定 2026-06-30
 ids  = 3, 4
 flip = true
-off1 = TODO
-off2 = TODO
+off1 = 0
+off2 = 0
 
 [ring]    # 无名指 —— 待标定
 ids  = 5, 6
