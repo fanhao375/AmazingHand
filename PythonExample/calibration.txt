@@ -1,0 +1,38 @@
+# Amazing Hand 手指标定记录（右手）
+#
+# 配合 AmazingHand_Calib.py 使用。每根手指记录：
+#   ids   : 两个舵机 ID
+#   flip  : 是否需要翻转开合方向（本右手实测需要 flip）
+#   off1  : ID1 中位偏移（度）
+#   off2  : ID2 中位偏移（度）
+#
+# 示例命令（食指）：
+#   python3 AmazingHand_Calib.py close --ids 1 2 --flip --off1 0 --off2 0
+#   python3 AmazingHand_Calib.py cycle --ids 1 2 --flip --off1 0 --off2 0
+#
+# 串口：/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B61034381-if00 @ 1000000
+# 通信：零依赖（stty + 原始设备读写），不用 rustypot
+
+[index]   # 食指  —— 已标定 2026-06-29
+ids  = 1, 2
+flip = true
+off1 = 0
+off2 = 0
+
+[middle]  # 中指  —— 待标定
+ids  = 3, 4
+flip = true
+off1 = TODO
+off2 = TODO
+
+[ring]    # 无名指 —— 待标定
+ids  = 5, 6
+flip = true
+off1 = TODO
+off2 = TODO
+
+[thumb]   # 拇指  —— 待标定
+ids  = 7, 8
+flip = true
+off1 = TODO
+off2 = TODO
