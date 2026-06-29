@@ -35,8 +35,8 @@ import AmazingHand_Calib as ah
 FINGERS = {
     "index":  dict(ids=(1, 2), off=(0.0, 0.0), flip=True,  present=True),
     "middle": dict(ids=(3, 4), off=(0.0, 0.0), flip=True,  present=True),
-    "ring":   dict(ids=(5, 6), off=(0.0, 0.0), flip=True,  present=False),
-    "thumb":  dict(ids=(7, 8), off=(0.0, 0.0), flip=True,  present=False),
+    "ring":   dict(ids=(5, 6), off=(0.0, 0.0), flip=True,  present=True),
+    "thumb":  dict(ids=(7, 8), off=(0.0, 0.0), flip=False, present=True),
 }
 
 # 安全角度范围（相对中位，单位度）

@@ -25,14 +25,14 @@ flip = true
 off1 = 0
 off2 = 0
 
-[ring]    # 无名指 —— 待标定
+[ring]    # 无名指 —— 已标定 2026-06-30
 ids  = 5, 6
 flip = true
-off1 = TODO
-off2 = TODO
+off1 = 0
+off2 = 0
 
-[thumb]   # 拇指  —— 待标定
+[thumb]   # 拇指  —— 已标定 2026-06-30（注意：拇指朝向相反，flip = false）
 ids  = 7, 8
-flip = true
-off1 = TODO
-off2 = TODO
+flip = false
+off1 = 0
+off2 = 0
