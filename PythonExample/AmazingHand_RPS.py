@@ -17,7 +17,7 @@ AmazingHand_RPS.py — 剪刀石头布（零依赖，复用 Calib 底层 + SYNC 
   python3 AmazingHand_RPS.py --port "$PORT"
   python3 AmazingHand_RPS.py --port "$PORT" --shake 3   # 先“石头石头石头”晃3下再出
 """
-import sys, os, time, argparse
+import sys, os, time, argparse, random
 import AmazingHand_Calib as ah
 
 # 手指配置：ids, (off1,off2), flip —— 按 calibration.txt
@@ -71,6 +71,8 @@ def main():
     ap.add_argument("--port", default=ah.DEFAULT_PORT)
     ap.add_argument("--baud", type=int, default=1000000)
     ap.add_argument("--shake", type=int, default=3, help="出拳前晃几下（石头）")
+    ap.add_argument("--random", action="store_true", help="随机出拳模式（跟你对战）")
+    ap.add_argument("--rounds", type=int, default=1, help="随机模式玩几局（默认 1）")
     ap.add_argument("--relax", action="store_true", help="结束松扭矩")
     args = ap.parse_args()
 
@@ -86,18 +88,34 @@ def main():
             ah.torque(fd, sid, True)
             ah.write_word(fd, sid, ah.ADDR_GOAL_SPEED, 0)
 
+    PLAYS = [("✊ 石头", ROCK), ("✌️ 剪刀", SCISSORS), ("✋ 布", PAPER)]
+
+    def shake_and_throw(name, gesture):
+        lerp_to(fd, PAPER, 0.4); time.sleep(0.2)
+        for k in range(args.shake):           # 石头石头石头……上下晃
+            lerp_to(fd, ROCK, 0.16)
+            lerp_to(fd, {n: (F_CLOSE - 25, 0.0) for n in FINGERS}, 0.16)
+        print(f"  出 → {name}")
+        lerp_to(fd, gesture, 0.4)
+        time.sleep(1.4)
+
     try:
-        lerp_to(fd, PAPER, 0.5); time.sleep(0.4)
-        # 预备：石头石头石头……上下晃
-        for k in range(args.shake):
-            print(f"石头…({k+1})")
-            lerp_to(fd, ROCK, 0.18)
-            lerp_to(fd, {n: (F_CLOSE - 25, 0.0) for n in FINGERS}, 0.18)
-        # 依次出三种手势
-        for name, g in [("✊ 石头", ROCK), ("✌️ 剪刀", SCISSORS), ("✋ 布", PAPER)]:
-            print(name)
-            lerp_to(fd, g, 0.45)
-            time.sleep(1.4)
+        if args.random:
+            for r in range(args.rounds):
+                print(f"=== 第 {r+1} 局 ===")
+                name, g = random.choice(PLAYS)   # 随机出拳
+                shake_and_throw(name, g)
+        else:
+            # 依次展示三种手势
+            lerp_to(fd, PAPER, 0.5); time.sleep(0.4)
+            for k in range(args.shake):
+                print(f"石头…({k+1})")
+                lerp_to(fd, ROCK, 0.18)
+                lerp_to(fd, {n: (F_CLOSE - 25, 0.0) for n in FINGERS}, 0.18)
+            for name, g in PLAYS:
+                print(name)
+                lerp_to(fd, g, 0.45)
+                time.sleep(1.4)
         lerp_to(fd, MIDDLE, 0.6)
         print("收。")
     except KeyboardInterrupt:
